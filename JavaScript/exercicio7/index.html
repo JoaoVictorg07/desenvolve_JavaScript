@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Curtidas</title>
+    <style>
+        #curtir {
+            background-color: #02fd56;
+            color: aliceblue;
+            font-size: 24px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        #limpar {
+            background-color: #fd0206;
+            color: aliceblue;
+            font-size: 24px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        input{
+            height: 45px;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+         // Função para carregar as curtidas do localStorage ao abrir a página
+         function carregarCurtidas() {
+            const curtidasSalvas = JSON.parse(localStorage.getItem("curtidas")) || [];
+            return curtidasSalvas;
+        }
+
+        // Array para armazenar os nomes das pessoas que curtiram
+        let curtidas = carregarCurtidas();
+
+        // Função para atualizar a lista de curtidas e exibir a mensagem adequada
+        function atualizarCurtidas() {
+            const nome = document.getElementById("nome").value.trim();
+
+            // Verifica se o nome não está vazio e não está duplicado na lista
+            if (nome && !curtidas.includes(nome)) {
+                curtidas.push(nome);
+                localStorage.setItem("curtidas", JSON.stringify(curtidas)); // Armazena no localStorage
+            }
+
+            // Atualiza o parágrafo com a mensagem adequada
+            atualizarParagrafo();
+            document.getElementById("nome").value = ""; // Limpa o campo de texto
+        }
+
+        // Função para atualizar o parágrafo com a mensagem de curtidas
+        function atualizarParagrafo() {
+            const paragrafo = document.getElementById("listaCurtidas");
+            if (curtidas.length === 0) {
+                paragrafo.textContent = "Ninguém curtiu";
+            } else if (curtidas.length === 1) {
+                paragrafo.textContent = `${curtidas[0]} curtiu`;
+            } else if (curtidas.length === 2) {
+                paragrafo.textContent = `${curtidas[0]} e ${curtidas[1]} curtiram`;
+            } else {
+                paragrafo.textContent = `${curtidas[0]}, ${curtidas[1]} e mais ${curtidas.length - 2} pessoas curtiram`;
+            }
+        }
+
+        // Função para limpar todas as curtidas do localStorage e da lista
+        function limparCurtidas() {
+            curtidas = [];
+            localStorage.removeItem("curtidas");
+            atualizarParagrafo();
+        }
+
+        // Atualiza a lista de curtidas ao carregar a página
+        window.onload = atualizarParagrafo;
+    </script>
+</head>
+<body>
+    <h1>Contador de Curtidas</h1>
+    <input type="text" id="nome" placeholder="Digite seu nome">
+    <button onclick="atualizarCurtidas()" id="curtir">Curtir</button>
+    <button onclick="limparCurtidas()" id="limpar">Limpar</button>
+    <p id="listaCurtidas">Ninguém curtiu</p>
+    <script></script>
+</body>
+</html>

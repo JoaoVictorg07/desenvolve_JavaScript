@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Usuários no GitHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #resultados {
+            margin-top: 20px;
+        }
+
+        .usuario {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .usuario img {
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .detalhesUsuario {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        async function buscarUsuarios() {
+            const termo = document.getElementById("termo").value.trim();
+            const resultadosDiv = document.getElementById("resultados");
+            resultadosDiv.innerHTML = "";
+
+            if (!termo) {
+                alert("Digite um termo para buscar usuários!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.github.com/search/users?q=${termo}`);
+                const data = await response.json();
+
+                if (data.total_count === 0) {
+                    resultadosDiv.innerHTML = "<p>Não foram encontrados usuários para esta pesquisa.</p>";
+                    return;
+                }
+
+                data.items.forEach(usuario => {
+                    const usuarioDiv = document.createElement("div");
+                    usuarioDiv.classList.add("usuario");
+
+                    const imagem = document.createElement("img");
+                    imagem.src = usuario.avatar_url;
+                    imagem.alt = `${usuario.login} avatar`;
+                    imagem.width = 50;
+
+                    const detalhesDiv = document.createElement("div");
+                    detalhesDiv.classList.add("detalhesUsuario");
+
+                    const login = document.createElement("h3");
+                    login.textContent = usuario.login;
+
+                    const perfilLink = document.createElement("a");
+                    perfilLink.href = usuario.html_url;
+                    perfilLink.target = "_blank";
+                    perfilLink.textContent = "Ver perfil";
+
+                    // Adiciona elementos ao container
+                    detalhesDiv.appendChild(login);
+                    detalhesDiv.appendChild(perfilLink);
+                    usuarioDiv.appendChild(imagem);
+                    usuarioDiv.appendChild(detalhesDiv);
+                    resultadosDiv.appendChild(usuarioDiv);
+                });
+            } catch (error) {
+                console.error("Erro ao buscar usuários:", error);
+                resultadosDiv.innerHTML = "<p>Ocorreu um erro ao buscar usuários. Tente novamente mais tarde.</p>";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Buscar Usuários no GitHub</h1>
+    <input type="text" id="termo" placeholder="Digite um nome de usuário">
+    <button onclick="buscarUsuarios()">Buscar</button>
+
+    <div id="resultados"></div>
+</body>
+</html>

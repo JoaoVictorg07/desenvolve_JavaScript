@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Feed de Rede Social</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .postForm {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .post {
+            background-color: white;
+            padding: 15px;
+            margin-top: 80px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .postHeader {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .postHeader img {
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .postHeader .username {
+            font-weight: bold;
+        }
+
+        .catImage {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .likeButton {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff69b4;
+            color: white;
+            cursor: pointer;
+        }
+
+        .likeButton:hover {
+            background-color: #ff1493;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="postForm">
+            <textarea id="postText" placeholder="O que você está pensando?"></textarea>
+            <button onclick="postar()">Postar</button>
+        </div>
+        <div id="feed"></div>
+    </div>
+
+    <script>
+        const feed = [];
+        const nomeUsuario = "SeuNomeDeUsuario";
+        const avatar = "https://i.pravatar.cc/50"; // Exemplo de avatar aleatório
+
+        async function postar() {
+            const texto = document.getElementById("postText").value.trim();
+            if (!texto) return;
+
+            // Requisição para obter uma imagem de gatinho
+            let catImage = '';
+            try {
+                const response = await fetch("https://api.thecatapi.com/v1/images/search");
+                const data = await response.json();
+                catImage = data[0].url;
+            } catch (error) {
+                console.error("Erro ao buscar imagem de gatinho:", error);
+                catImage = "https://placekitten.com/300/200"; // Imagem padrão em caso de erro
+            }
+
+            // Criar um novo post
+            const novoPost = {
+                data: new Date(),
+                nomeUsuario: nomeUsuario,
+                avatar: avatar,
+                texto: texto,
+                imagem: catImage,
+                likes: 0
+            };
+
+            // Adicionar o post ao início do feed
+            feed.unshift(novoPost);
+            document.getElementById("postText").value = "";
+            exibirFeed();
+        }
+
+        function exibirFeed() {
+            const feedContainer = document.getElementById("feed");
+            feedContainer.innerHTML = "";
+
+            feed.forEach((post, index) => {
+                // Criar a estrutura do post
+                const postDiv = document.createElement("div");
+                postDiv.classList.add("post");
+
+                // Cabeçalho do post com avatar e nome de usuário
+                const postHeader = document.createElement("div");
+                postHeader.classList.add("postHeader");
+
+                const avatarImg = document.createElement("img");
+                avatarImg.src = post.avatar;
+                avatarImg.alt = "Avatar";
+                avatarImg.width = 50;
+                avatarImg.height = 50;
+
+                const username = document.createElement("div");
+                username.classList.add("username");
+                username.textContent = post.nomeUsuario;
+
+                postHeader.appendChild(avatarImg);
+                postHeader.appendChild(username);
+
+                // Conteúdo do post
+                const postText = document.createElement("p");
+                postText.textContent = post.texto;
+
+                const catImage = document.createElement("img");
+                catImage.src = post.imagem;
+                catImage.classList.add("catImage");
+                catImage.alt = "Gatinho fofo";
+
+                // Botão de curtir
+                const likeButton = document.createElement("button");
+                likeButton.classList.add("likeButton");
+                likeButton.textContent = `Curtir (${post.likes})`;
+                likeButton.onclick = function() {
+                    post.likes++;
+                    exibirFeed();
+                };
+
+                // Adicionar elementos ao postDiv
+                postDiv.appendChild(postHeader);
+                postDiv.appendChild(postText);
+                postDiv.appendChild(catImage);
+                postDiv.appendChild(likeButton);
+
+                // Adicionar postDiv ao container de feed
+                feedContainer.appendChild(postDiv);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Curtidas</title>
+    <style>
+        button{
+            background-color: #fd0206;
+            color: aliceblue;
+            font-size: 24px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        input{
+            height: 45px;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+        const curtidas = [];
+
+        function atualizarCurtidas() {
+            const nome = document.getElementById("nome").value.trim();
+        
+            if (nome && !curtidas.includes(nome)) {
+                curtidas.push(nome);
+            }
+        
+            const paragrafo = document.getElementById('listaCurtidas');
+            if (curtidas.length === 0) {
+                paragrafo.textContent = "Ninguém curtiu";
+            } else if (curtidas.length === 1) {
+                paragrafo.textContent = `${curtidas[0]} curtiu`;
+            } else if (curtidas.length === 2) {
+                paragrafo.textContent = `${curtidas[0]} e ${curtidas[1]} curtiram`;
+            } else {
+                paragrafo.textContent = `${curtidas[0]}, ${curtidas[1]} e mais ${curtidas.length - 2} pessoas curtiram`;
+            }
+        
+            document.getElementById("nome").value = "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Contador de Curtidas</h1>
+    <input type="text" id="nome" placeholder="Digite seu nome">
+    <button onclick="atualizarCurtidas()">Curtir</button>
+    <p id="listaCurtidas">Ninguém curtiu</p>
+    <script></script>
+</body>
+</html>
